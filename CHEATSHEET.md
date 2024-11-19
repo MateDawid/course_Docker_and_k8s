@@ -119,3 +119,6 @@ docker network create python-redis-network
 ```sh
 docker container run --network python-redis-network -d --name my-redis redis
 ```
+
+# docker-compose
+

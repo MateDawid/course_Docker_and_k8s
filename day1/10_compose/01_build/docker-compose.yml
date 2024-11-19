@@ -1,7 +1,22 @@
 services:
-  web:
-    build: .
+  python:
+    image: krajewskim/python-api:new
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_HOST: redis
+      LOG_LEVEL: INFO
     ports:
-    - "85:80"
+      - 5002:5002
   redis:
-    image: "redis:alpine"
+    image: redis:alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 1s
+      retries: 3
+volumes:
+  redis_data:
