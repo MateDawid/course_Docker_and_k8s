@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: python-pod
+  labels:
+    app: python-api
+spec:
+  containers:
+  - name: python-container
+    image: krajewskim/python-api:new
