@@ -19,3 +19,25 @@ Każdy mikroserwis powinien mieć osobną bazę danych. Dla ciężkich baz danyc
 
 ![alt text](image-4.png)
 
+## 2.1. Dockerfile
+
+```bash
+docker container run my-hello-world <params>
+```
+<params> nadpisuje CMD z obrazu. ENTRYPOINT zostaje bez zmian.
+
+Przykład:
+```Dockerfile
+FROM alpine
+LABEL imagetype="workshops"
+ENTRYPOINT ["/bin/echo", "Hello"]
+CMD ["world"]
+```
+
+Najpierw wykonuje się ENTRYPOINT, potem CMD, niezależnie od kolejności podania w Dockerfile'u.
+
+ENTRYPOINT uruchamia aplikacje, CMD przyjmuje argumenty.
+
+Warstwy, które się najczęściej zmieniają na końcu.
+
+
