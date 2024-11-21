@@ -1,0 +1,20 @@
+apiVersion: v1
+data:
+  README.md: "```sh\r\nkubectl create configmap configuration --from-file=./\r\nkubectl
+    get configmap/configuration -o yaml\r\n```\r\n\r\n# From env file\r\n```sh\r\nkubectl
+    create configmap fromenv --from-env-file=env-file-example\r\nkubectl get configmap/fromenv
+    -o json\r\nkubectl get configmap/fromenv -o yaml\r\n```\r\n# Data as file\r\n\r\n```sh\r\nkubectl
+    create configmap test-config --from-file=<my-key-name>=<path-to-file>\r\nkubectl
+    create configmap test-config --from-file=s.json=service.json\r\nkubectl get configmap/test-config
+    -o yaml\r\n```\r\n# Create pods\r\n\r\n```sh\r\nkubectl apply -f pod-config.yaml\r\nkubectl
+    logs configmap-pod\r\nkubectl logs configmap-pod | grep line\r\n```\r\n\r\n```sh\r\nkubectl
+    apply -f pod-config-volume.yaml\r\nkubectl logs configmap-volume-pod\r\n```\r\n\r\n#
+    Autoupdates for mounted configmaps\r\n```sh\r\nkubectl edit configmap configuration\r\n#
+    change service-b.config\r\nkubectl logs -f configmap-volume-pod\r\n```\r\n"
+  env-file-example: "# won't go to configmap\r\nthis=will\r\nline=2\r\n"
+  service-b.config: "schedule: 21:00:00\r\nrestart: true\r\n"
+  service.config: "schedule: 20:00:00\r\nrestart: false"
+  service.json: "{\r\n\t\t  \"schedule\":\"19:00:00\",\r\n\t\t  \"restart\":false\r\n}\r\n"
+kind: ConfigMap
+metadata:
+  name: configuration

@@ -183,6 +183,8 @@ curl localhost:5001/v2/_catalog
 
 # kubernetes
 ```sh
+# Create cluster
+kind create cluster --config ./kind.yaml --name workshop
 # Load pod from pod.yaml
 kubectl apply -f pod.yaml
 # List of pods in default namespace
@@ -207,4 +209,173 @@ kubectl port-forward pod/myapp-pod 8080:80
 kubectl describe pod <pod-name>
 # List nodes
 kubectl get nodes -o wide
+# Node details
+kubectl describe node <node-name>
+# Expose app by NodePort
+kubectl expose pod myapp-pod --type=NodePort --port=80
+# Check host port of app exposed by NodePort
+kubectl get service
+```
+
+## Resources for set based selectors
+- Job
+- Deployment
+- ReplicaSet
+- DaemonSet
+- StatefullSet
+
+```yml
+selector:
+  matchLabels:
+    component: redis
+  matchExpressions:
+    - {key: tier, operator: In, values: [cache]}
+    - {key: environment, operator: NotIn, values: [dev]}
+```
+
+```sh
+kubectl get pod
+kubectl apply -f replica-set.yaml
+kubectl get all
+kubectl get events
+```
+## change pod name
+```sh
+kubectl apply -f pod.yaml
+kubectl get pod
+```
+
+## delete pod
+```sh
+kubectl delete pod myapp-pod
+kubectl get pod
+```
+## scale replica
+```sh
+kubectl scale rs replicate-my-app --replicas=3
+kubectl get all
+```
+## delete replica set
+```sh
+kubectl delete rs replicate-my-app
+kubectl get all
+```
+## delete & keep pods
+```sh
+kubectl apply -f replica-set.yaml
+kubectl get rs
+kubectl describe rs replicate-my-app
+kubectl delete rs replicate-my-app --cascade=false
+kubectl get rs
+kubectl get pod
+```
+
+## Create deployment
+
+```sh
+kubectl apply -f deployment.yaml
+kubectl get all
+kubectl scale deployment/nginx-deployment --replicas=0
+kubectl get all
+```
+
+## Use env variable
+add `env` list
+
+```sh
+kubectl rollout history deployments/nginx-deployment
+kubectl apply -f deployment.yaml
+
+kubectl rollout status deployment/nginx-deployment
+kubectl rollout history deployment/nginx-deployment --revision=1
+kubectl rollout history deployment/nginx-deployment --revision=2
+kubectl annotate deployment/nginx-deployment kubernetes.io/change-cause="env updated"
+kubectl rollout history deployments/nginx-deployment
+```
+
+## Exec container and check env exists:
+
+```sh
+kubectl get pods
+kubectl get pods -l app=myapp -o jsonpath='{.items[0].metadata.name}'
+kubectl exec -ti $(kubectl get pods -l app=myapp -o jsonpath='{.items[0].metadata.name}') -- env | grep TEST_ENV
+```
+
+## Rollback to previous version
+
+```sh
+kubectl rollout undo deployment/nginx-deployment
+kubectl annotate deployment/nginx-deployment kubernetes.io/change-cause="env removed"
+kubectl rollout history deployments/nginx-deployment
+
+kubectl exec -ti $(kubectl get pods -l app=myapp -o jsonpath='{.items[0].metadata.name}') -- env | grep TEST_ENV
+
+kubectl rollout undo deployment/nginx-deployment --to-revision=2
+kubectl exec -ti $(kubectl get pods -l app=myapp -o jsonpath='{.items[0].metadata.name}') -- env | grep TEST_ENV
+```
+
+## Scale deployment 
+```sh
+kubectl describe svc my-app-service
+kubectl scale deployment nginx-deployment --replicas=3
+kubectl describe svc my-app-service
+```
+ - check endpoints
+
+
+## Debug information:
+```sh
+kubectl logs -l app=myapp
+kubectl exec -ti $(kubectl get pods -l app=myapp -o jsonpath='{.items[0].metadata.name}') -- cat /etc/resolv.conf
+kubectl exec -ti $(kubectl get pods -l app=myapp -o jsonpath='{.items[0].metadata.name}') -- curl my-app-service
+kubectl logs -l app=myapp
+kubectl get rs
+```
+
+## Namespaces
+```sh
+kubectl get namespaces
+kubectl create namespace <namespace-name>
+kubectl apply -f . -n <namespace-name>
+```
+
+# Config maps
+
+## From file
+```sh
+kubectl create configmap configuration --from-file=./
+kubectl get configmap/configuration -o yaml > cm.yaml
+```
+
+## From env
+```sh
+kubectl create configmap fromenv --from-env-file=env-file-example
+kubectl get configmap/fromenv -o json
+kubectl get configmap/fromenv -o yaml
+```
+## Data as file
+
+```sh
+kubectl create configmap test-config --from-file=<my-key-name>=<path-to-file>
+kubectl create configmap test-config --from-file=s.json=service.json
+kubectl get configmap/test-config -o yaml
+```
+## Create pods
+
+```sh
+kubectl apply -f pod-config.yaml
+kubectl logs configmap-pod
+kubectl logs configmap-pod | grep line
+```
+
+```sh
+kubectl apply -f pod-config-volume.yaml
+kubectl logs configmap-volume-pod
+```
+
+## Autoupdates for mounted configmaps
+```sh
+kubectl edit configmap configuration
+# change service-b.config
+kubectl logs -f configmap-volume-pod
 ```
