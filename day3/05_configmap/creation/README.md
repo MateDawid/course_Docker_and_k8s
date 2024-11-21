@@ -1,9 +1,12 @@
+# From file
 ```sh
+kubectl api-resources
 kubectl create configmap configuration --from-file=./
-kubectl get configmap/configuration -o yaml
+kubectl get configmap/configuration -o yaml > cm.yaml
+kubectl create configmap configuration --from-file=./ --dry-run=client -o yaml > cm.yaml
 ```
 
-# From env file
+# From env
 ```sh
 kubectl create configmap fromenv --from-env-file=env-file-example
 kubectl get configmap/fromenv -o json
