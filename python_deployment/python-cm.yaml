@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: python-cm
+  labels:
+    projekt: python
+data:
+  LOG_LEVEL: INFO
+  REDIS_HOST: redis-service
+  REDIS_PORT: "6379"
