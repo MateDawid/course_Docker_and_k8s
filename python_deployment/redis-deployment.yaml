@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  labels:
+    projekt: python
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+        projekt: python
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        resources: {}
+        ports:
+        - containerPort: 6379
+        livenessProbe:
+          exec:
+            command: ["redis-cli", "ping"]
+        readinessProbe:
+          tcpSocket:
+            port: 6379
+        volumeMounts:
+          - mountPath: /data
+            name: redis-data
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-pvc
