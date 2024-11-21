@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python
+  labels:
+    projekt: python
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: python
+  template:
+    metadata:
+      labels:
+        app: python
+        projekt: python
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: python-api
+        image: krajewskim/python-api:new
+        ports:
+          - containerPort: 5002
+            name: api
+        resources: {}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: api
+        readinessProbe:
+          tcpSocket:
+            port: api
+        env:
+          - name: REDIS_HOST
+            value: redis-service
+          - name: LOG_LEVEL
+            value: INFO
