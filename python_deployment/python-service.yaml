@@ -10,4 +10,4 @@ spec:
   ports:
   - port: 80
     targetPort: api
-  type: NodePort
+  # type: NodePort // Not needed anymore, due to using Ingress
