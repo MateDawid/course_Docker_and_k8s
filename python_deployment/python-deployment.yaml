@@ -30,8 +30,6 @@ spec:
         readinessProbe:
           tcpSocket:
             port: api
-        env:
-          - name: REDIS_HOST
-            value: redis-service
-          - name: LOG_LEVEL
-            value: INFO
+        envFrom:
+          - configMapRef:
+              name: python-cm
